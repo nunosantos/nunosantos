@@ -1,5 +1,3 @@
-## Hi there 👋
-
 # 👨‍💻 Nuno Santos
 
 ## Senior Software Engineer
