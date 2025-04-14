@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software Engineer GitHub Profile</title>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-purple: #bf4af0;
+            --accent-orange: #f0883e;
+            --terminal-green: #4af47a;
+            --border-color: #30363d;
+            --card-bg: #1e2430;
+            --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            line-height: 1.5;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            padding: 2rem;
+            position: relative;
+        }
+        
+        /* Terminal Header */
+        .terminal-header {
+            background-color: var(--bg-secondary);
+            border-radius: 10px 10px 0 0;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .terminal-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .terminal-close { background-color: #ff5f56; }
+        .terminal-minimize { background-color: #ffbd2e; }
+        .terminal-expand { background-color: #27c93f; }
+        
+        .terminal-title {
+            margin-left: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Terminal Body */
+        .terminal-body {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 0 0 10px 10px;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-in-out;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+        }
+        
+        .terminal-line {
+            display: flex;
+            margin-bottom: 0.75rem;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.5s ease-in-out forwards;
+        }
+        
+        .prompt {
+            color: var(--accent-green);
+            margin-right: 0.75rem;
+            user-select: none;
+        }
+        
+        .command {
+            color: var(--text-primary);
+        }
+        
+        .output {
+            color: var(--text-secondary);
+            margin-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .highlight {
+            color: var(--accent-blue);
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 15px;
+            background-color: var(--terminal-green);
+            animation: blink 1s infinite;
+            vertical-align: middle;
+            margin-left: 2px;
+        }
+        
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        /* Card Styles */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-icon {
+            font-size: 1.5rem;
+            color: var(--accent-blue);
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        /* Commit History Card */
+        .commit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .commit-item {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 1rem;
+            padding: 0.75rem;
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            border-left: 3px solid var(--accent-blue);
+        }
+        
+        .commit-item:nth-child(2n) {
+            border-left-color: var(--accent-purple);
+        }
+        
+        .commit-item:nth-child(3n) {
+            border-left-color: var(--accent-green);
+        }
+        
+        .commit-item:nth-child(4n) {
+            border-left-color: var(--accent-orange);
+        }
+        
+        .commit-item:hover {
+            transform: translateX(5px);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .commit-hash {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--accent-orange);
+            margin-top: 5px;
+        }
+        
+        .commit-message {
+            font-weight: 500;
+        }
+        
+        .commit-repo {
+            font-size: 0.8rem;
+            color: var(--accent-blue);
+            display: block;
+            margin-top: 0.25rem;
+        }
+        
+        .commit-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        
+        /* Skills Card */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+        
+        .skill-item {
+            position: relative;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .skill-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .skill-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 0.5rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            font-size: 1.5rem;
+        }
+        
+        .skill-name {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        /* Projects Card */
+        .project-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .project-item {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .project-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .project-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent-blue);
+        }
+        
+        .project-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+        }
+        
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .tech-tag {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            background-color: rgba(88, 166, 255, 0.1);
+            border-radius: 20px;
+            color: var(--accent-blue);
+        }
+        
+        /* Stats Card */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .stat-item {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        /* About Card */
+        .about-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .profile-pic {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--accent-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .profile-info h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .profile-info .title {
+            color: var(--accent-blue);
+            font-size: 0.9rem;
+        }
+        
+        .about-bio {
+            line-height: 1.6;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .social-link {
+            color: var(--text-secondary);
+            transition: color 0.3s ease, transform 0.3s ease;
+            font-size: 1.2rem;
+            text-decoration: none;
+        }
+        
+        .social-link:hover {
+            color: var(--accent-blue);
+            transform: translateY(-3px);
+        }
+        
+        /* Code Lines Animation */
+        .code-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .code-line {
+            position: absolute;
+            height: 1px;
+            background-color: rgba(88, 166, 255, 0.1);
+            animation: codeLine 15s infinite linear;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+        
+        @keyframes codeLine {
+            0% {
+                left: -10%;
+                width: 10%;
+            }
+            100% {
+                left: 120%;
+                width: 10%;
+            }
+        }
+        
+        /* Media Queries */
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .skills-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .skills-grid,
+            .project-grid,
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Terminal Section -->
+        <div>
+            <div class="terminal-header">
+                <span class="terminal-button terminal-close"></span>
+                <span class="terminal-button terminal-minimize"></span>
+                <span class="terminal-button terminal-expand"></span>
+                <span class="terminal-title">user@github ~ </span>
+            </div>
+            <div class="terminal-body">
+                <div class="code-lines">
+                    <div class="code-line" style="top: 20%; animation-delay: 0s;"></div>
+                    <div class="code-line" style="top: 40%; animation-delay: 3s;"></div>
+                    <div class="code-line" style="top: 60%; animation-delay: 5s;"></div>
+                    <div class="code-line" style="top: 80%; animation-delay: 9s;"></div>
+                </div>
+                
+                <div class="terminal-line" style="animation-delay: 0.2s;">
+                    <span class="prompt">$</span>
+                    <span class="command">whoami</span>
+                </div>
+                <div class="output" style="animation: slideUp 0.5s ease-in-out forwards; animation-delay: 0.4s; opacity: 0; transform: translateY(20px);">
+                    Software Engineer | Full Stack Developer | Problem Solver
+                </div>
+                
+                <div class="terminal-line" style="animation-delay: 0.6s;">
+                    <span class="prompt">$</span>
+                    <span class="command">cat skills.json</span>
+                </div>
+                <div class="output" style="animation: slideUp 0.5s ease-in-out forwards; animation-delay: 0.8s; opacity: 0; transform: translateY(20px);">
+                    {<br>
+                    &nbsp;&nbsp;"languages": ["JavaScript", "TypeScript", "Python", "Java"],<br>
+                    &nbsp;&nbsp;"frontend": ["React", "Vue.js", "Angular", "HTML/CSS"],<br>
+                    &nbsp;&nbsp;"backend": ["Node.js", "Express", "Django", "Spring Boot"],<br>
+                    &nbsp;&nbsp;"databases": ["MongoDB", "PostgreSQL", "MySQL", "Redis"]<br>
+                    }
+                </div>
+                
+                <div class="terminal-line" style="animation-delay: 1s;">
+                    <span class="prompt">$</span>
+                    <span class="command">more about.md</span>
+                </div>
+                <div class="output" style="animation: slideUp 0.5s ease-in-out forwards; animation-delay: 1.2s; opacity: 0; transform: translateY(20px);">
+                    Passionate about creating elegant solutions to complex problems.<br>
+                    Open source contributor and continuous learner.<br>
+                    Building scalable and maintainable applications.
+                </div>
+                
+                <div class="terminal-line" style="animation-delay: 1.4s;">
+                    <span class="prompt">$</span>
+                    <span class="command">node connect.js</span>
+                </div>
+                <div class="output" style="animation: slideUp 0.5s ease-in-out forwards; animation-delay: 1.6s; opacity: 0; transform: translateY(20px);">
+                    > Connection established<br>
+                    > Welcome to my GitHub profile!
+                </div>
+                
+                <div class="terminal-line" style="animation-delay: 1.8s;">
+                    <span class="prompt">$</span>
+                    <span class="command">_</span>
+                    <span class="cursor"></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- About Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">👨‍💻</div>
+                    <h2 class="card-title">About Me</h2>
+                </div>
+                <div class="about-content">
+                    <div class="profile-header">
+                        <div class="profile-pic">SE</div>
+                        <div class="profile-info">
+                            <h2>Your Name</h2>
+                            <div class="title">Senior Software Engineer</div>
+                        </div>
+                    </div>
+                    
+                    <div class="about-bio">
+                        Experienced software engineer with a passion for creating efficient, scalable, and maintainable solutions. Specializing in full-stack development with expertise in modern frameworks and architecture patterns. Always learning and exploring new technologies.
+                    </div>
+                    
+                    <div class="social-links">
+                        <a href="#" class="social-link">📧</a>
+                        <a href="#" class="social-link">🐦</a>
+                        <a href="#" class="social-link">💼</a>
+                        <a href="#" class="social-link">🌐</a>
+                        <a href="#" class="social-link">📝</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📊</div>
+                    <h2 class="card-title">GitHub Stats</h2>
+                </div>
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <div class="stat-value">42</div>
+                        <div class="stat-label">Repositories</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">184</div>
+                        <div class="stat-label">Contributions</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">37</div>
+                        <div class="stat-label">Pull Requests</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">128</div>
+                        <div class="stat-label">Stars</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">45</div>
+                        <div class="stat-label">Followers</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">18</div>
+                        <div class="stat-label">Issues</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Skills Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🔧</div>
+                    <h2 class="card-title">Tech Stack</h2>
+                </div>
+                <div class="skills-grid">
+                    <div class="skill-item">
+                        <div class="skill-icon" style="color: #f0db4f;">JS</div>
+                        <div class="skill-name">JavaScript</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon" style="color: #3178c6;">TS</div>
+                        <div class="skill-name">TypeScript</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon" style="color: #61dafb;">⚛️</div>
+                        <div class="skill-name">React</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon" style="color: #3fb27f;">📦</div>
+                        <div class="skill-name">Node.js</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon" style="color: #306998;">🐍</div>
+                        <div class="skill-name">Python</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon" style="color: #00acd7;">G</div>
+                        <div class="skill-name">Go</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon" style="color: #e535ab;">🔍</div>
+                        <div class="skill-name">GraphQL</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon" style="color: #FF9900;">🔶</div>
+                        <div class="skill-name">AWS</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon" style="color: #336791;">🐘</div>
+                        <div class="skill-name">PostgreSQL</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon" style="color: #13aa52;">🍃</div>
+                        <div class="skill-name">MongoDB</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon" style="color: #2496ed;">🐳</div>
+                        <div class="skill-name">Docker</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-icon" style="color: #326ce5;">☸️</div>
+                        <div class="skill-name">Kubernetes</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Projects Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🚀</div>
+                    <h2 class="card-title">Featured Projects</h2>
+                </div>
+                <div class="project-grid">
+                    <div class="project-item">
+                        <div class="project-title">DevFlow</div>
+                        <div class="project-desc">A CI/CD pipeline automation tool for development teams</div>
+                        <div class="project-tech">
+                            <span class="tech-tag">Node.js</span>
+                            <span class="tech-tag">React</span>
+                            <span class="tech-tag">Docker</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-title">CodeMentor</div>
+                        <div class="project-desc">AI-powered code review and mentoring platform</div>
+                        <div class="project-tech">
+                            <span class="tech-tag">Python</span>
+                            <span class="tech-tag">TensorFlow</span>
+                            <span class="tech-tag">Vue.js</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-title">DataVisualizer</div>
+                        <div class="project-desc">Interactive data visualization library</div>
+                        <div class="project-tech">
+                            <span class="tech-tag">TypeScript</span>
+                            <span class="tech-tag">D3.js</span>
+                            <span class="tech-tag">Canvas API</span>
+                        </div>
+                    </div>
+                    <div class="project-item">
+                        <div class="project-title">MicroService Framework</div>
+                        <div class="project-desc">Lightweight microservice architecture boilerplate</div>
+                        <div class="project-tech">
+                            <span class="tech-tag">Go</span>
+                            <span class="tech-tag">gRPC</span>
+                            <span class="tech-tag">Redis</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Commit History Card -->
+            <div class="card" style="grid-column: span 2;">
+                <div class="card-header">
+                    <div class="card-icon">📝</div>
+                    <h2 class="card-title">Recent Commits</h2>
+                </div>
+                <div class="commit-list">
+                    <div class="commit-item">
+                        <div class="commit-hash">a2e4f6c</div>
+                        <div>
+                            <div class="commit-message">Implement new authentication system with JWT</div>
+                            <span class="commit-repo">user-service</span>
+                        </div>
+                        <div class="commit-date">2 days ago</div>
+                    </div>
+                    <div class="commit-item">
+                        <div class="commit-hash">b7d9e12</div>
+                        <div>
+                            <div class="commit-message">Fix performance issues in data processing pipeline</div>
+                            <span class="commit-repo">data-processor</span>
+                        </div>
+                        <div class="commit-date">4 days ago</div>
+                    </div>
+                    <div class="commit-item">
+                        <div class="commit-hash">3f8c51a</div>
+                        <div>
+                            <div class="commit-message">Add unit tests for API endpoints</div>
+                            <span class="commit-repo">api-gateway</span>
+                        </div>
+                        <div class="commit-date">1 week ago</div>
+                    </div>
+                    <div class="commit-item">
+                        <div class="commit-hash">e9d2b07</div>
+                        <div>
+                            <div class="commit-message">Update Docker configurations for development environment</div>
+                            <span class="commit-repo">devops-tools</span>
+                        </div>
+                        <div class="commit-date">1 week ago</div>
+                    </div>
+                    <div class="commit-item">
+                        <div class="commit-hash">f1a6c39</div>
+                        <div>
+                            <div class="commit-message">Refactor component structure for better maintainability</div>
+                            <span class="commit-repo">frontend-app</span>
+                        </div>
+                        <div class="commit-date">2 weeks ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Generate animated code lines
+        function createCodeLines() {
+            const codeLines = document.querySelectorAll('.code-line');
+            
+            codeLines.forEach((line, index) => {
+                line.style.top = `${20 * (index + 1)}%`;
+                line.style.width = `${Math.random() * 20 + 10}%`;
+                line.style.animationDelay = `${Math.random() * 10}s`;
+                line.style.opacity = 0.1 + Math.random() * 0.2;
+            });
+        }
+        
+        // Simulate typing effect
+        function initTypeWriter() {
+            const terminalLines = document.querySelectorAll('.terminal-line');
+            
+            terminalLines.forEach((line, index) => {
+                const command = line.querySelector('.command');
+                if (command) {
+                    const text = command.textContent;
+                    command.textContent = '';
+                    line.style.opacity = 1;
+                    line.style.transform = 'translateY(0)';
+                    
+                    let i = 0;
+                    const typeWriter = () => {
+                        if (i < text.length) {
+                            command.textContent += text.charAt(i);
+                            i++;
+                            setTimeout(typeWriter, 50);
+                        }
+                    };
+                    
+                    setTimeout(() => {
+                        typeWriter();
+                    }, 500 * index);
+                }
+            });
+        }
+        
+        // Appear animations for cards
+        function animateCards() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.opacity = 0;
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    card.style.opacity = 1;
+                    card.style.transform = 'translateY(0)';
+                }, 200 * (index + 1));
+            });
+        }
+        
+        // Animate commit items
+        function animateCommits() {
+            const commitItems = document.querySelectorAll('.commit-item');
+            commitItems.forEach((item, index) => {
+                item.style.opacity = 0;
+                item.style.transform = 'translateX(-10px)';
+                setTimeout(() => {
+                    item.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    item.style.opacity = 1;
+                    item.style.transform = 'translateX(0)';
+                }, 300 * (index + 1) + 500);
+            });
+        }
+        
+        // Run animations on load
+        window.addEventListener('load', () => {
+            createCodeLines();
+            initTypeWriter();
+            animateCards();
+            animateCommits();
+            
+            // Add more floating particles periodically
+            setInterval(() => {
+                const container = document.querySelector('.code-lines');
+                if (container && container.children.length < 30) {
+                    const line = document.createElement('div');
+                    line.classList.add('code-line');
+                    line.style.top = `${Math.random() * 100}%`;
+                    line.style.width = `${Math.random() * 20 + 5}%`;
+                    line.style.animationDelay = '0s';
+                    line.style.opacity = 0.1 + Math.random() * 0.1;
+                    container.appendChild(line);
+                }
+            }, 5000);
+        });
+    </script>
+</body>
+</html>
